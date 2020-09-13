@@ -1,5 +1,5 @@
 ---
-# pandoc --pdf-engine=xelatex -i personal_statement.md -o personal_statement.pdf
+# pandoc --pdf-engine=xelatex -F mermaid-filter -i ml_hw1_theory.md -o Octavian-HW1t.pdf
 title: Machine Learning HW1 - Theory
 # author: Octavian Neamțu
 geometry: margin=1.5cm
@@ -10,13 +10,16 @@ fontsize: 12pt
 
 \newcommand\ctilde{\ \textasciitilde\ }
 \newcommand\sothat{\ \text{s.t.}\ }
+\newcommand\gain{\text{gain}}
+\newcommand\prob{\mathbb{P}}
+\newcommand\tif{\text{\ if\ }}
 
-1. *Question:* Let $D$ be a distribution on the domain ${ \{-1, 1\} }^n$ and let
+1. **Question:** Let $D$ be a distribution on the domain ${ \{-1, 1\} }^n$ and let
 $f, g : \{-1, 1\}^n \rightarrow \{-1, 1\}$ be two Boolean functions. Prove that
 
 $$\mathbb{P}_{x \ctilde D}[f(x) \neq g(x)] = \frac{1 - \mathbb{E}_{x \ctilde D}[f(x)g(x)]}{2}$$
 
-*Answer:*
+**Answer:**
 
 Notice that we have 2 complementary events: $A_{=} = \{ x | f(x) = g(x) \}$
 and $A_{\neq} = \{ x | f(x) \neq g(x) \}$. Thus $\mathbb{P}_{x \ctilde D}[A_=] + \mathbb{P}_{x \ctilde D}[A_\neq] = 1$.
@@ -47,16 +50,16 @@ Therefore
 
 Q.E.D.
 
-*Question:* Would this still be true if the domain were some other domain, such as $\mathbb{R}^n$?
+**Question:** Would this still be true if the domain were some other domain, such as $\mathbb{R}^n$?
 
-*Answer:* Not necessarily, depending on some fundamental assumptions. If we are working in
+**Answer:** Not necessarily, depending on some fundamental assumptions. If we are working in
 ZFC, then by using the axiom of choice we can construct a wacky non-measurable set $W$ by the [Vitali method](https://archive.org/details/axiomchoicelectu00herr_278/page/n132/mode/2up) on the pre-image of our distribution $D$ so that $W \subset D^{-1}(\mathbb{R}^n)$. Then we can pick $f$ as
 
 \begin{align*}
   f(x) &=
     \begin{cases}
-      \text{-1} \text{ if } x \in W \\
-      \text{1} \text{ if } x \notin W
+      \text{-1} \tif x \in W \\
+      \text{1} \tif x \notin W
     \end{cases}
   \\
   g(x) &= 1
@@ -75,11 +78,11 @@ Assuming that the sets $A_=$ and $A_\neq$ are measurable, then the result holds 
   \mathbb{P}_{x \ctilde D}[f(x) \neq g(x)] &= \frac{1 - \mathbb{E}_{x \ctilde D}[f(x)g(x)]}{2}
 \end{align*}
 
-2. *Question:* Let $f$ be a decision tree with $t$ leaves over the variables $x = (x_1, ... , x_n) \in \{−1, 1\}^n$.
+2. **Question:** Let $f$ be a decision tree with $t$ leaves over the variables $x = (x_1, ... , x_n) \in \{−1, 1\}^n$.
 Explain how to write $f$ as a multivariate polynomial $p(x_1, ... , x_n)$ such that for ever
 input $x \in \{−1, 1\}^n, f(x) = p(x)$.
 
-*Answer:*
+**Answer:**
 
 I initially started with a more complicated proof, but I'm hoping a simpler one that can
 be extensible will be clearer.
@@ -89,10 +92,10 @@ Assume that the tree's leaf values are $l_1, l_2 ... l_t \in \{-1, 1\}$. We can 
 $$
   f(x) =
     \begin{cases}
-      l_1 \text{ if } \lor_j\land_{k = 1}^n x_k = v_{1jk} \\
-      l_2 \text{ if } \lor_j\land_{k = 1}^n x_k = v_{2jk} \\
+      l_1 \tif \lor_j\land_{k = 1}^n x_k = v_{1jk} \\
+      l_2 \tif \lor_j\land_{k = 1}^n x_k = v_{2jk} \\
       ... \\
-      l_t \text{ if } \lor_j\land_{k = 1}^n x_k = v_{tjk} \\
+      l_t \tif \lor_j\land_{k = 1}^n x_k = v_{tjk} \\
     \end{cases}
 $$
 
@@ -114,9 +117,9 @@ graph TD
 $$
   f_{\text{eg}}(x) =
     \begin{cases}
-      l_1 \text{ if } (x_1 = -1 \land x_2 = -1) \lor (x_1 = -1 \land x_2 = 1) \\
-      l_2 \text{ if } (x_1 = 1 \land x_2 = -1) \\
-      l_3 \text{ if } (x_1 = 1 \land x_2 = 1) \\
+      l_1 \tif (x_1 = -1 \land x_2 = -1) \lor (x_1 = -1 \land x_2 = 1) \\
+      l_2 \tif (x_1 = 1 \land x_2 = -1) \\
+      l_3 \tif (x_1 = 1 \land x_2 = 1) \\
     \end{cases}
 $$
 
@@ -168,3 +171,203 @@ to only cover the relevant paths to a leaf. It would make the proof more complic
 that's probably the more compact form.
 
 Note 2: You can apply the same proof for any label domain, not just the binary one.
+
+3. **Question:** Compute a depth-two decision tree for the training data in table 1 using the Gini function,
+C(a) = 2a(1 − a) as described in class.
+What is the overall accuracy on the training data of the tree?
+
+\begin{tabular}{ c | c | c | c | c }
+$x_1$ & $x_2$ & $x_3$ & Number of positive examples & Number of negative examples\\
+0 & 0 & 0 & 10 & 20\\
+0 & 0 & 1 & 25 & 5\\
+0 & 1 & 0 & 35 & 15\\
+0 & 1 & 1 & 35 & 5\\
+1 & 0 & 0 & 5 & 15\\
+1 & 0 & 1 & 30 & 10\\
+1 & 1 & 0 & 10 & 10\\
+1 & 1 & 1 & 15 & 5\\
+\end{tabular}
+
+**Answer:**
+
+Let's use $-1$ for a negative outcome and $1$ for a positive outcome.
+
+$\prob(y = -1) = \frac{85}{250} = \frac{17}{50}$
+
+Let's pick a root.
+
+\begin{align*}
+\gain(x_1) &= C(\prob[y = -1]) - (\prob[x_1 = 0]C(\prob[y = -1 | x_1 = 0]) + \prob[x_1 = 1]C(\prob[y = -1 | x_1 = 1]))\\
+  &= \frac{561}{1250} - (\frac{3}{5}\cdot\frac{21}{50} + \frac{2}{5}\cdot\frac{12}{25}) = \frac{3}{625}\\
+\gain(x_2) &= C(\prob[y = -1]) - (\prob[x_2 = 0]C(\prob[y = -1|x_2 = 0]) + \prob[x_2 = 1]C(\prob[y = -1|x_2 = 1]))\\
+  &= \frac{561}{1250} - (\frac{12}{25}\cdot\frac{35}{72} + \frac{13}{25}\cdot\frac{133}{338}) = \frac{529}{48750}\\
+\gain(x_3) &= C(\prob[y = -1]) - (\prob[x_3 = 0]C(\prob[y = -1|x_3 = 0]) + \prob[x_3 = 1]C(\prob[y = -1|x_3 = 1]))\\
+  &= \frac{561}{1250} - (\frac{12}{25}\cdot\frac{1}{2} + \frac{13}{25}\cdot\frac{105}{338}) = \frac{384}{8125}
+\end{align*}
+
+So $x_3$ is the winner with $\frac{384}{8125}$. Let's look at the next level
+
+\begin{align*}
+\gain(x_1 | x_3 = 0) &= C(\prob[y = -1 | x_3 = 0]) \\
+&- (\prob[x_1 = 0 | x_3 = 0]C(\prob[y = -1 | x_1 = 0 \land x_3 = 0])\\
+&  + \prob[x_1 = 1 | x_3 = 0]C(\prob[y = -1 | x_1 = 1 \land x_3 = 0]))\\
+  &= \frac{1}{2} - (\frac{2}{3}\cdot\frac{63}{128} + \frac{1}{3}\cdot\frac{15}{32}) = \frac{1}{64}\\
+\gain(x_2 | x_3 = 0) &= C(\prob[y = -1 | x_3 = 0]) \\
+&- (\prob[x_2 = 0 | x_3 = 0]C(\prob[y = -1 | x_2 = 0 \land x_3 = 0])\\
+&  + \prob[x_2 = 1 | x_3 = 0]C(\prob[y = -1 | x_2 = 1 \land x_3 = 0]))\\
+ &= \frac{1}{2} - (\frac{5}{12}\cdot\frac{21}{50} + \frac{7}{12}\cdot\frac{45}{98}) = \frac{2}{35}\\
+\gain(x_1 | x_3 = 1) &= C(\prob[y = -1 | x_3 = 1]) \\
+&- (\prob[x_1 = 0 | x_3 = 1]C(\prob[y = -1 | x_1 = 0 \land x_3 = 1])\\
+&  + \prob[x_1 = 1 | x_3 = 1]C(\prob[y = -1 | x_1 = 1 \land x_3 = 1]))\\
+  &= \frac{105}{338} - (\frac{7}{13}\cdot\frac{12}{49} + \frac{6}{13}\cdot\frac{3}{8}) = \frac{27}{4732}\\
+\gain(x_2 | x_3 = 1) &= C(\prob[y = -1 | x_3 = 1]) \\
+&- (\prob[x_2 = 0 | x_3 = 1]C(\prob[y = -1 | x_2 = 0 \land x_3 = 1])\\
+&  + \prob[x_2 = 1 | x_3 = 1]C(\prob[y = -1 | x_2 = 1 \land x_3 = 1]))\\
+ &= \frac{105}{338} - (\frac{7}{13}\cdot\frac{33}{98} + \frac{6}{13}\cdot\frac{5}{18}) = \frac{4}{3549}\\
+\end{align*}
+
+
+So the local maxima are - $\gain(x_2 | x_3 = 0) > \gain(x_1 | x_3 = 0)$ and $\gain(x_1 | x_3 = 1) > \gain(x_2 | x_3 = 1)$.
+
+Side-stepping ID3, we can also look at the decision between branches - what gain overall maximized?
+
+$$\gain(x_2 | x_3 = 0) + \gain(x_1 | x_3 = 1) = \frac{1487}{23660} > \frac{3805}{227136} = \gain(x_1 | x_3 = 0) + \gain(x_2 | x_3 = 1)$$
+
+So the choice of algorithm doesn't impact our tree. (Interesting Q: is this always the case?).
+
+Now to compute the leaves:
+
+\begin{align*}
+l(x_3 = 0, x_2 = 0) &= -1 (35 \text{ outcomes out of } 50)\\
+l(x_3 = 0, x_2 = 1) &= 1 (45 \text{ outcomes out of } 70)\\
+l(x_3 = 1, x_1 = 0) &= 1 (60 \text{ outcomes out of } 70)\\
+l(x_3 = 1, x_1 = 1) &= 1 (45 \text{ outcomes out of } 60)\\
+\end{align*}
+
+Our hard-worked tree:
+
+~~~mermaid
+graph TD
+    x3-->|-1| x2;
+    x3-->|1| x1;
+    x2-->|-1| l1{-1 neg};
+    x2-->|1| l2{1 pos};
+    x1-->|-1| l3{1 neg};
+    x1-->|1| l4{1 pos};
+~~~
+
+I'll include the code I used to compute some of the results at the end of the doc.
+
+**Question:** What is the overall accuracy on the training data of the tree?
+
+**Answer:** We can look at the numbers we used to compute the leaves to figure out the number of values
+the tree agrees with the training data. Accuracy $= \frac{35 + 45 + 60 + 45}{50 + 70 + 70 + 60} = \frac{185}{250} = .74$.
+
+4. **Question:** Suppose the domain $X$ is the real line, $\mathbb{R}$, and the labels lie in $Y = \{−1, 1\}$,
+let $C$ be the concept class consisting of simple threshold functions of the form $h_θ$ for some $θ ∈  \mathbb{R}$,
+where $h_θ(x) = −1$ for all $x ≤ θ$ and $h_θ(x) = 1$ otherwise. Give a simple and efficient PAC learning
+algorithm for $C$ that uses only $m = O(\frac{1}{\epsilon}\log(\frac{1}{\delta})$) training examples to output a classifier with
+error at most $\epsilon$ with probability at least $1 - \delta$.
+
+**Answer:**
+
+Let
+
+$$a = \max(x | S(x) = -1)$$
+
+W.l.o.g. assume $a$ exists. If $\{x | S(x) = -1\} = \varnothing$ then use the negative bijection $f(x) = -x$ to 'flip' the
+set, and have a value for $a$ (assuming that $S \neq \varnothing$ from the get-go). You can also alternatively pick
+$a = \min(x | S(x) = 1)$ in the case where it doesn't exist; it makes the proof more complicated.
+
+Let algorithm $A$ output classifier
+$$
+h_S(x) =
+  \begin{cases}
+    -1 \tif x \leq a \\
+    1 \tif x > a \\
+  \end{cases}
+$$
+
+Good to note that $a \leq \theta$; if $\theta < a$, then our training set would have values that don't
+agree with $h_\theta$ (which is a contradiction, and an offense to our perfectly realizable oracle).
+
+Pick $\theta_a < \theta$ such that $\prob[x \in (\theta_a, \theta)] = \epsilon$.
+
+If $\theta_a < a$ then using the fact that $err_{x \leq a}(h_S) = 0$ because $h_S(x) = h_\theta(x)$ on all
+values of $x \leq a$, $err_{x > \theta}(h_S) = 0$ because $h_S(x) = h_\theta(x)$ on all values
+$x > \theta$.
+
+\begin{align*}
+err(h_S) &= err_{x \leq a}(h_S) + err_{a < x}(h_S) \\
+    &= 0 + err_{a < x}(h_S) \\
+    &\leq err_{\theta_a < x}(h_S) \\
+    &= err_{\theta_a < x \leq \theta}(h_S) + err_{\theta \leq x}(h_S) \\
+    &= \epsilon + 0 = \epsilon \\
+\end{align*}
+
+So if $\theta_a < a$ then $err(h_S) \leq \epsilon$. Then
+
+\begin{align*}
+  \prob[err(h_S) > \epsilon] &= \prob[\theta_a \geq a] \\
+      &= \prob[S \cap (\theta_a, \theta) = \varnothing] \\
+      &= (1 - \epsilon)^{m} \\
+      &\leq e^{-\epsilon m} \leq \delta \iff \\
+    -\epsilon m &\leq \ln(\delta) \iff \\
+    m &\geq -\frac{1}{\epsilon}\ln(\delta) \iff \\
+    m &\geq \frac{1}{\epsilon}\ln(\frac{1}{\delta}) \\
+\end{align*}
+
+Thus algorithm $A$ satisfies outputting a classifier $h_S$ with error at most $\epsilon$ with probability
+at least $1 - \delta$ conditioned on $|S| = m = O(\frac{1}{\epsilon}\log(\frac{1}{\delta}))$.
+
+\newpage
+
+**Q3 Code Annex ruby helper script:**
+```ruby
+info = "
+0 & 0 & 0 & 10 & 20\\
+0 & 0 & 1 & 25 & 5\\
+0 & 1 & 0 & 35 & 15\\
+0 & 1 & 1 & 35 & 5\\
+1 & 0 & 0 & 5 & 15\\
+1 & 0 & 1 & 30 & 10\\
+1 & 1 & 0 & 10 & 10\\
+1 & 1 & 1 & 15 & 5\\
+"
+
+t = info.gsub("&", "").split("\\\n").map { |x| x.split("  ").map(&:to_i) }
+
+def gain(t, i)
+  gini = -> (x) do
+    2 * x * (1 - x)
+  end
+
+  all = -> (x) do
+    x.map { _1[3] + _1[4] }.sum
+  end
+
+  neg = -> (x) do
+    x.map { _1[4] }.sum
+  end
+
+  c_init = Rational(t.then(&neg), t.then(&all)).then(&gini)
+
+  p_0 = Rational(t.select { _1[i] == 0}.then(&all),
+    t.then(&all))
+
+  c_0 = Rational(t.select { _1[i] == 0 }.then(&neg),
+    t.select { _1[i] == 0 }.then(&all)).then(&gini)
+
+  p_1 = Rational(t.select { _1[i] == 1}.then(&all),
+    t.then(&all))
+
+  c_1 = Rational(t.select { _1[i] == 1 }.then(&neg),
+    t.select { _1[i] == 1 }.then(&all)).then(&gini)
+
+  return c_init, p_0, c_0, p_1, c_1, c_init - (p_0 * c_0 + p_1 * c_1)
+end
+
+# for leaf computation
+t.select { _1[2] == 1 && _1[0] == 1 }.then { "-1 #{neg.(_1)}, 1 #{all.(_1) - neg.(_1)}, #{all.(_1)}" }
+```
+
