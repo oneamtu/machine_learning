@@ -320,6 +320,84 @@ So if $\theta_a < a$ then $err(h_S) \leq \epsilon$. Then
 Thus algorithm $A$ satisfies outputting a classifier $h_S$ with error at most $\epsilon$ with probability
 at least $1 - \delta$ conditioned on $|S| = m = O(\frac{1}{\epsilon}\log(\frac{1}{\delta}))$.
 
+5. a. **Question:** Fix a classifier $h : X → Y$ . If $err(h) > \epsilon$, what is the probability that $h$ gets $k$
+random examples all correct? How large does $k$ need to be for this probability to be at most $δ'$?
+
+**Answer:**
+
+\begin{align*}
+\prob_{x \ctilde S_k}[h(x) = c(x)] &= (1 - \prob_{x \ctilde S_k}[h(x) \neq c(x)])^k \\
+  &< (1 - \epsilon)^k \\
+  &\leq e^{-\epsilon k} \leq \delta' \iff \\
+  k \geq \frac{1}{\epsilon}ln(\frac{1}{\delta'})
+\end{align*}
+
+So for $k \geq \frac{1}{\epsilon}ln(\frac{1}{\delta'})$ we know the probability of getting $k$ examples all
+correct is less than $\delta'$.
+
+b. **Question:** How many times can $A$ possibly update its state? That is, how many different classifiers
+can it possibly go through? And therefore, how many examples do we need to see before
+we can be sure of getting a block of $k$ examples all correct?
+
+**Answer:** $A$ can update its state $t$ times, since we assume it updates its state only on a mistake, and it
+can make at most $t$ of those. If $A$ makes $k$ mistakes on inputs $x_i, 0 \leq i \leq k$ and updates its state $k$ times,
+then we know there is at least one block of size $k$ where $h(x) = c(x)$, namely $\{x_i\}$.
+
+So let's assume we see $k$ blocks but don't get $k$ mistakes. That means, by the pigeon hole principle,
+at least one of the blocks doesn't have a mistake, so we have a guarantee of an errorless $k$ block.
+
+So after seeing $k^2$ examples we know we either have encountered a $k$-sized block with no error, or
+have a guarantee of encountering one.
+
+c. **Question:** Let $E_i$ be the event that $A$ in its $i$th state, call it $h_i$, has error greater than $\epsilon$,
+yet we output $h_i$. (When would this happen?) Argue that the “failure event” of our overall
+PAC learner is $E = \cup_i E_i$.
+
+We would output an insufficient $h_i$ that has $err(h_i) > \epsilon$ if we haven't covered enough
+mistakes to progress $A$ to a state $i + 1$.
+In other words, we would output $h_i$ if we are "unlucky" enough to have less than $i$ blocks with
+mistakes, and more than $|S|/i - i$ blocks with $h_i(x) = c(x)$.
+
+Note that there exists a $k$ such that $err(h_k) \leq \epsilon$. This $k$ exists because
+the error decreases monotonically $err(h_i) > err(h_{i+1})$
+and $err(h_t) = 0$. Error decreases monotonically because each update decreases the number of values
+$h(x) and c(x)$ disagree on for at least one value of $x$. Thus if
+$err(h_i) > \epsilon, \exists k \sothat err(h_i) > \epsilon \geq err(h_k) \geq err(h_t) = 0$.
+
+The "failure event" $E = \cup_i E_i$ represents the event of outputting any hypotheses $h_i$
+having error greater than $\epsilon$. Implicitly, if $E$ does not happen, then we output any hypothesis $h_k$
+not in any $E_i$, then $err(h_k) \leq \epsilon$. If $E$ happens, then we know $err(h_S) > \epsilon$.
+Thus $E$ is equivalent with $err(h_S) > \epsilon$.
+
+d. **Question:** Put everything together and fully describe a PAC learner that is able, with probability
+of failure at most $δ$, to output a classifier with error at most $\epsilon$. How many examples
+does the learner need to use?
+
+**Answer:** Let $h_S = h_k$ be the hypothesis returned by algorithm $A$ run on sample $S$ such that
+we return current $A$ hypothesis $h_i$ if we process a block of size $i$ with no errors.
+If for any $h_i$ intermediate hypotheses $err(h_i) \leq \epsilon$, then from point c. we know that $err(h_s) < \epsilon$. Let's find a bound
+for the failure event.
+
+Using c:
+
+\begin{align*}
+\prob[err(h_S) > \epsilon] = \prob[E] &= \prob[\cup_i E_i] \\
+  &\leq \sum_i \prob[E_i] \\
+\end{align*}
+
+Using b. we know that $\prob[E_i] = \prob_{x ~ \ctilde \text{block of size}i}[h_i(x) = c(x)]^{\frac{|S|}{i} - (i + 1)}$.
+
+Using a. we know that $\prob[h_i(x) = c(x)] < e^{-\epsilon k}$, and we know we're summing less than $t$ terms,
+and from $b$ we know that $k < \sqrt(|S|)$, so all together now:
+
+\begin{align*}
+  \prob[err(h_S) > \epsilon] &< \sum_i e^{-\epsilon i^2 } \\
+  &< te^{-\epsilon |S|} \leq \delta \iff \\
+  |S| &\geq \frac{1}{\epsilon}(ln(\frac{1}{\delta}) - ln(t))
+\end{align*}
+
+Which implies that mistake-bounded learning is stronger in the PAC model.
+
 \newpage
 
 **Q3 Code Annex ruby helper script:**
